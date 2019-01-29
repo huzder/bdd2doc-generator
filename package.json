@@ -1,0 +1,32 @@
+{
+  "name": "bdd2doc-generator",
+  "version": "1.0.0",
+  "description": "API member description generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine-node spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huzder/bdd2doc-generator.git"
+  },
+  "keywords": [
+    "API",
+    "documentation",
+    "generation",
+    "BDD",
+    "test"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huzder/bdd2doc-generator/issues"
+  },
+  "homepage": "https://github.com/huzder/bdd2doc-generator#readme",
+  "dependencies": {
+    "acquit": "^1.0.3"
+  },
+  "devDependencies": {
+    "jasmine-node": "^2.0.1"
+  }
+}
