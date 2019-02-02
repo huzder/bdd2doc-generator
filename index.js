@@ -1,6 +1,9 @@
 
 var acquit = require('acquit'), fs = require('fs'), path = require('path');
 
+
+var skipCodeRowMarker = "//#skip#", defaultSpecTestEnding = "SpecTests.js";
+
 function getNamespaces(apiModel) {
     if (!apiModel)
         return [];
@@ -122,8 +125,6 @@ function processRootBlock(namespaces, block) {
         processNamespaceContentBlock(block, getNamespace(namespaces, "Global", true));
 }
 
-var skipCodeRowMarker = "//#skip#";
-
 function findAllFiles(dir, filelist, fileEnding) {
     files = fs.readdirSync(dir);
     filelist = filelist || [];
@@ -147,7 +148,7 @@ function fillFromTestFile(currentAPIModel, filePath) {
     fillFromTestCode(currentAPIModel, content);
 }
 function createFromDirectory(directory, fileEnding) {
-    fileEnding = fileEnding || "Tests.js";
+    fileEnding = fileEnding || defaultSpecTestEnding;
     var files = findAllFiles(directory, [], fileEnding);
     var currentApiModel = {};
     files.forEach(f => fillFromTestFile(currentApiModel, f));
