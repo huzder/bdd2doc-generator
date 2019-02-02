@@ -6,6 +6,10 @@
   "scripts": {
     "test": "jasmine-node spec"
   },
+  "bin": {
+    "bdd2doc-generator": "./bin/cli.js"
+  },
+  "preferGlobal": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/huzder/bdd2doc-generator.git"

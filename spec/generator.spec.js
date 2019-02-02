@@ -1,4 +1,4 @@
-var generator = require("../index.js"), fs = require('fs');
+var generator = require("../index.js"), path = require('path');
 
 describe("Generator", function () {
     describe("parses root DESCRIBE blocks", function () {
@@ -111,6 +111,7 @@ describe("utilities", function() {
         var result = generator.createFromDirectory(__dirname, "sample1.js");
         expect(result.namespaces.length).toBe(1);
         expect(result.namespaces[0].classes[0].name).toBe("MyComponent");
+        expect(result.files[0]).toBe(path.join(__dirname, "testsample1.js"));
     });
     describe("findByCompositeKey", function() {
         var apiModel = null;

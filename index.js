@@ -126,12 +126,13 @@ function processRootBlock(namespaces, block) {
         processNamespaceContentBlock(block, getNamespace(namespaces, "Global", true));
 }
 
-function findAllFiles(dir, filelist, fileEnding) {
+function findMatchingFiles(dir, fileEnding, filelist) {
+    fileEnding = fileEnding || defaultSpecTestEnding;
     files = fs.readdirSync(dir);
     filelist = filelist || [];
     files.forEach(function (file) {
         if (fs.statSync(path.join(dir, file)).isDirectory()) {
-            filelist = findAllFiles(path.join(dir, file), filelist, fileEnding);
+            filelist = findMatchingFiles(path.join(dir, file), fileEnding, filelist);
         }
         else if (file.indexOf(fileEnding) > -1) {
             filelist.push(path.join(dir, file));
@@ -140,19 +141,14 @@ function findAllFiles(dir, filelist, fileEnding) {
     return filelist;
 };
 function fillFromTestCode(currentAPIModel, testCode) {
-    var rootBlocks = acquit.parse(testCode);
-    var namespaces = getNamespaces(currentAPIModel);
-    rootBlocks.forEach(b => processRootBlock(namespaces, b));
+    acquit.parse(testCode).forEach(b => processRootBlock(getNamespaces(currentAPIModel), b));
 }
 function fillFromTestFile(currentAPIModel, filePath) {
-    var content = fs.readFileSync(filePath, { encoding: "UTF-8" });
-    fillFromTestCode(currentAPIModel, content);
+    fillFromTestCode(currentAPIModel, fs.readFileSync(filePath, { encoding: "UTF-8" }));
 }
 function createFromDirectory(directory, fileEnding) {
-    fileEnding = fileEnding || defaultSpecTestEnding;
-    var files = findAllFiles(directory, [], fileEnding);
-    var currentApiModel = {};
-    files.forEach(f => fillFromTestFile(currentApiModel, f));
+    var currentApiModel = { files: findMatchingFiles(directory, fileEnding) };
+    currentApiModel.files.forEach(f => fillFromTestFile(currentApiModel, f));
     return currentApiModel;
 }
 function findByCompositeKey(apiModel, key) {
@@ -197,5 +193,6 @@ module.exports = {
     fillFromTestCode: fillFromTestCode,
     fillFromTestFile: fillFromTestFile,
     createFromDirectory: createFromDirectory,
-    findByCompositeKey: findByCompositeKey
+    findByCompositeKey: findByCompositeKey,
+    findMatchingFiles: findMatchingFiles
 };
