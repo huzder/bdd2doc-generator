@@ -63,10 +63,14 @@ function processClassMemberBlock(block, classEntity) {
             .split(',')
             .map(p => {
                 var parts = p.split(':');
-                return {
+                var mParam = {
                     name: (parts[0] || "").trim(),
                     type: (parts[1] || "object").trim()
                 };
+                mParam.required = !mParam.name.endsWith("?");
+                if(!mParam.required)
+                    mParam.name = mParam.name.substr(0, mParam.name.length - 1);
+                return mParam;
             });
         entity =
             getMethod(classEntity, matches[1], matches[3], getDescription(block),

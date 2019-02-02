@@ -81,6 +81,7 @@ describe("Generator", function () {
                 it("with parameters list", function () {
                     expect(memberModel.params[0].name).toBe("dataSource");
                     expect(memberModel.params[0].type).toBe("object");
+                    expect(memberModel.params[0].required).toBe(false);
                 });
                 it("with return type", function () {
                     expect(memberModel.returnType).toBe("void");

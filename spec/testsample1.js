@@ -38,7 +38,7 @@ describe("class MyComponent extends ComponentBase", function () {
     /*
     some description for method SetDataSource
     */
-    describe("public SetDataSource(dataSource: object): void", function () {
+    describe("public SetDataSource(dataSource?: object): void", function () {
         it("?Accepts JSON", function () {
             componentInst.SetDataSource({ seria1: [] });
             expect(componentInst.Series[0].Name).toBe("someName");//#skip#
