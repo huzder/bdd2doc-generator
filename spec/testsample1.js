@@ -1,3 +1,6 @@
+/*
+Class description here
+*/
 describe("class MyComponent extends ComponentBase", function () {
     var componentInst;
     beforeEach(function () {
@@ -53,6 +56,17 @@ describe("class MyComponent extends ComponentBase", function () {
                 done();
             });
             componentInst.SetDataSource(url);
+        });
+    });
+    describe("public static Highlight(text: string, searchContainer: object, classNameOrColor?: string, bgColor?: string): void", function() {
+        it("?Highlight with className", function() {
+            MyComponent.Highlight("word1", document.body, "word-highlighted");
+        });
+        it("?Highligh with specified color and background color", function() {
+            MyComponent.Highlight("word1", document.body, "#FFFFFF", "#FF0000");
+        });
+        it("?Remove highlightning from container", function() {
+            MyComponent.Highlight(null, document.body);
         });
     });
     /*

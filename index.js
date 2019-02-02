@@ -15,9 +15,10 @@ function getNamespace(namespaces, nsName, isGlobal) {
     var ns = namespaces.filter(n => n.name === nsName)[0];
     return ns || (namespaces[namespaces.length] = { name: nsName, isGlobal: !!isGlobal, classes: [] });
 }
-function getClass(className, ns, baseType) {
+function getClass(className, ns, baseType, description) {
     return ns.classes[ns.classes.length] = {
-        name: className, baseType: baseType, fields: [], eventHandlers: [], methods: [], useCases: [], limitations: []
+        name: className, baseType: baseType, description: description,
+        fields: [], eventHandlers: [], methods: [], useCases: [], limitations: []
     };
 }
 function getMethod(classEntity, name, returnType, description, params, isStatic) {
@@ -105,7 +106,7 @@ function processClassContentBlock(block, classEntity) {
 }
 function processClassBlock(block, ns) {
     var classNameParts = block.contents.replace("class ", "").split(" extends ");
-    var classEntity = getClass(classNameParts[0], ns, classNameParts[1]);
+    var classEntity = getClass(classNameParts[0], ns, classNameParts[1], getDescription(block));
     block.blocks.forEach(b => processClassContentBlock(b, classEntity));
 }
 function processNamespaceContentBlock(block, ns) {
@@ -155,20 +156,41 @@ function createFromDirectory(directory, fileEnding) {
     return currentApiModel;
 }
 function findByCompositeKey(apiModel, key) {
-    if (!apiModel || !key || key.indexOf("js-") === -1)
-        return null;
-    var partsRegex = /js-(\w+)\.(\w+)/;
-    var matches = partsRegex.exec(key);
+    var jsMemberKeyRegex = /js-(\w+)\.?(\w+)?\.?(static)?(\([\w\s\,]*\))?/;
+    var matches = jsMemberKeyRegex.exec(key);
     if (matches === null)
         return null;
-    var className = matches[1];
-    var memberName = matches[2];
-    var classModels = apiModel.namespaces
-                        .map(n => n.classes.filter(c => c.name === className))
-                        .reduce(function(p, c) { return p.concat(c); }, []);
-    if(classModels.length === 0)
+    var className = matches[1], memberName = matches[2], isStatic = !!matches[3], methodParams = matches[4];
+    var classModel = getNamespaces(apiModel)
+                    .filter(n => n.isGlobal)
+                    .map(n => n.classes.filter(c => c.name === className))
+                    .reduce((p, c) => p.concat(c), [])[0];
+    if(!classModel)
         return null;
-    return classModels[0].methods.filter(m => m.name === memberName)[0];
+
+    var foundApiMember = null;
+    if(methodParams && memberName) {
+        var requiredParams = methodParams.substr(1, methodParams.length - 2).split(',').map(m => m.trim());
+        foundApiMember = classModel.methods.filter(m => 
+            m.name === memberName && m.isStatic === isStatic && 
+            m.params.every(mp => requiredParams.indexOf(mp.name) > -1 || !mp.required)
+        )[0];
+    }
+    else if(memberName) {
+        foundApiMember = 
+            classModel.eventHandlers.filter(eh => eh.name === memberName)[0] || 
+            classModel.fields.filter(f => f.name === memberName)[0];
+    }
+    else {// class model was requested
+        foundApiMember = { 
+            name: classModel.name,
+            description: classModel.description,
+            baseType: classModel.baseType, 
+            useCases: classModel.useCases, 
+            limitations: classModel.limitations 
+        };
+    }
+    return foundApiMember || null;
 }
 
 module.exports = {

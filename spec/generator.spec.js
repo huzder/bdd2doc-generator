@@ -31,6 +31,9 @@ describe("Generator", function () {
             it("with base type", function () {
                 expect(classModel.baseType).toBe("ComponentBase");
             });
+            it("with description", function() {
+                expect(classModel.description).toBe("Class description here");
+            });
             it("with useCases defined by it('?...', ", function () {
                 var useCase = classModel.useCases[0];
                 expect(useCase.title).toBe("User story title - eg 'How to get editor selection'");
@@ -114,8 +117,28 @@ describe("utilities", function() {
         beforeEach(function() {
             apiModel = generator.createFromDirectory(__dirname, "sample1.js");
         });
-        it("by method name", function() {
-            expect(generator.findByCompositeKey(apiModel, "js-MyComponent.SetDataSource").name).toBe("SetDataSource");
+        it("finds class by class name", function() {
+            var classModel = generator.findByCompositeKey(apiModel, "js-MyComponent");
+
+            expect(classModel.fields).toBeUndefined("should not return inner entities");
+            expect(classModel.methods).toBeUndefined("should not return inner entities");
+            expect(classModel.eventHandlers).toBeUndefined("should not return inner entities");
+
+            expect(classModel.limitations).not.toBeUndefined();
+            expect(classModel.useCases).not.toBeUndefined();
+        });
+        it("find event handler", function() {
+            expect(generator.findByCompositeKey(apiModel, "js-MyComponent.OptionChanged").handlerType).toBe("SomeTypedEventHandler");
+        });
+        it("finds method by method name without parameters if method has no required parameters", function() {
+            expect(generator.findByCompositeKey(apiModel, "js-MyComponent.SetDataSource()").name).toBe("SetDataSource");
+        });
+        it("finds method by method name and required parameters if method has required parameters", function() {
+            expect(generator.findByCompositeKey(apiModel, "js-MyComponent.Highlight(text, searchContainer)"))
+                .toBeNull("no static specified in key");
+
+            var key = "js-MyComponent.Highlight.static(text, searchContainer)";
+            expect(generator.findByCompositeKey(apiModel, key).params[2].name).toBe("classNameOrColor");
         });
     });
 });
