@@ -45,8 +45,10 @@ function processInput(args) {
     var currentArg = null;
     for (let i = 2; i < args.length; i++) {
         var a = args[i];
-        currentArg = inputParams.filter(p => p.name === a)[0] || currentArg;
-        if(currentArg)
+        var p = inputParams.filter(p => p.name === a)[0];
+        if(p)
+            currentArg = p;
+        else if(currentArg)
             currentArg.value.push(a);
     }
     var required = inputParams.filter(p => p.value.length === 0 && p.required);
