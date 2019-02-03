@@ -2,7 +2,7 @@
 var acquit = require('acquit'), fs = require('fs'), path = require('path');
 
 
-var skipCodeRowMarker = "//#skip#", defaultSpecTestEnding = "SpecTests.js";
+var skipCodeRowMarker = "//#skip#", defaultSpecTestEnding = "SpecTests.js", endOfLine = require('os').EOL;
 
 function getNamespaces(apiModel) {
     if (!apiModel)
@@ -39,14 +39,14 @@ function getField(classEntity, name, type, description, defaultValue) {
     };
 }
 function getDescription(block) {
-    return block.comments.map(c => c.trim()).filter(c => !!c).join("\n");
+    return block.comments.map(c => c.trim()).filter(c => !!c).join(endOfLine);
 }
 function processCodeString(codeString) {
-    var rows = codeString.split("\n");
+    var rows = codeString.split(endOfLine);
     return rows.filter(r =>
         r.indexOf(skipCodeRowMarker) === -1 &&
         r.indexOf("done()") === -1 &&
-        r.indexOf("expect(") === -1).join("\n");
+        r.indexOf("expect(") === -1).join(endOfLine);
 }
 function processLimitationBlock(block, classEntity) {
     var title = block.contents.substring(1);
